@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Same theme name; adds Android 12+ splash attributes -->
+    <style name="Theme.LittleGenius" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+
+        <!-- Android 12+ splash screen config -->
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="android:windowSplashScreenBackground">@android:color/white</item>
+        <!-- (Optional) Keep logo on screen a bit longer with installSplashScreen() code you already have -->
+    </style>
+</resources>

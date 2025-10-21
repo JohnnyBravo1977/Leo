@@ -1,0 +1,26 @@
+# Android / Gradle
+.gradle/
+build/
+*/build/
+**/build/
+local.properties
+
+# Android Studio
+.idea/
+*.iml
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Keystores / secrets
+*.jks
+*.keystore
+*.pem
+*.p12
+*.crt
+*.key
+
+# Logs / misc
+*.log
+captures/
