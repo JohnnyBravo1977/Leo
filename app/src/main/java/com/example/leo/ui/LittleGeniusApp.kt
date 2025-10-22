@@ -9,12 +9,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.leo.ui.settings.SettingsScreen
 import com.example.leo.ui.chat.ChatScreen
+import com.example.leo.data.ThemeRepository
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,8 +27,13 @@ fun LittleGeniusApp() {
     val backStack by nav.currentBackStackEntryAsState()
     val route = backStack?.destination?.route
 
-    // Simple demo state (persist later with DataStore)
-    var isDark by rememberSaveable { mutableStateOf(false) }
+    // Persisted theme using a tiny SharedPreferences-backed repo
+    val ctx = LocalContext.current
+    val themeRepo = remember { ThemeRepository(ctx) }
+
+    // Initialize from storage; rememberSaveable keeps it through config changes
+    var isDark by rememberSaveable { mutableStateOf(themeRepo.getDarkMode()) }
+
     val messages = remember { mutableStateListOf<String>() }
 
     val colorScheme = if (isDark) darkColorScheme() else lightColorScheme()
@@ -65,7 +74,11 @@ fun LittleGeniusApp() {
                 composable(Routes.Settings) {
                     SettingsScreen(
                         isDark = isDark,
-                        onToggleDark = { isDark = it }
+                        onToggleDark = {
+                            isDark = it
+                            // Persist immediately
+                            themeRepo.setDarkMode(it)
+                        }
                     )
                 }
             }
