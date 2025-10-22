@@ -10,6 +10,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      # Use a writable location for the debug keystore to avoid permission issues on runners
+      ANDROID_SDK_HOME: ${{ runner.temp }}
 
     steps:
       - name: Checkout
@@ -34,8 +37,10 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Configure SDK (licenses)
-        run: yes | sudo /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+      - name: Accept Android SDK licenses
+        run: |
+          yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+          yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses || true
 
       - name: Build Debug APK
         run: ./gradlew :app:assembleDebug --stacktrace
