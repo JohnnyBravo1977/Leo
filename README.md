@@ -1,47 +1,45 @@
-# Little Genius (Leo App)
+# 🟢 Leo (Android)
 
-**Version:** V12 (Stable Active Build)  
-**Type:** Offline/Online AI Chat Assistant  
-**Language:** Kotlin (Jetpack Compose + Material 3)  
-**Author:** Dad & Head Mistress
+[![Android CI — V13-dev](https://github.com/JohnnyBravo1977/Leo/actions/workflows/android-ci.yml/badge.svg?branch=V13-dev)](https://github.com/JohnnyBravo1977/Leo/actions/workflows/android-ci.yml)
 
----
+**Status:** ✅ Build passing on `V13-dev`
 
-## 🧠 Overview
-Little Genius is an intelligent, voice-ready assistant designed to work **both offline and online**.  
-Built with Jetpack Compose and a persistent local data layer, Leo learns and adapts, handling messages, retries, themes, and more — all while keeping data stored locally.
+Lightweight Jetpack Compose app with a single top app bar, chat screen, and settings screen (Dark Mode included).
 
 ---
 
-## 🧩 Current Features
-- Persistent chat history with `ChatStore` and `ChatRecord`
-- Offline/online message retry logic
-- Timestamps and delivery statuses
-- Swipe-to-delete with undo
-- Dynamic dark/light theme toggle
-- Centered app title (“Little Genius”)
-- Settings screen ready for extension
-- Baseline UI built for Material 3
+## 🧰 Developer Quickstart
 
----
-
-## 🗂️ Project Structure
-app/ ├─ src/main/java/com/example/leo/ │ ├─ data/ │ │ ├─ ChatStore.kt │ │ ├─ ChatRecord.kt │ │ ├─ SyncStatus.kt │ │ └─ ThemeStore.kt │ ├─ ui/ │ │ ├─ ChatScreen.kt │ │ ├─ SettingsScreen.kt │ │ ├─ AppScaffold.kt │ │ ├─ Navigation.kt │ │ └─ theme/ │ │ ├─ AppTheme.kt │ │ ├─ Color.kt │ │ ├─ Type.kt │ │ └─ Theme.kt │ └─ MainActivity.kt ├─ res/ │ └─ drawable/, layout/, values/ ├─ AndroidManifest.xml ├─ build.gradle.kts ├─ settings.gradle.kts └─ gradle.properties
-
-
----
-
-## 🔧 Build Setup
-1. Clone the repo
+1. Open in Android Studio (Electric Eel+)
+2. Apply patch files via **VCS → Apply Patch…**
+3. Build:
    ```bash
-   git clone https://github.com/YOUR-USERNAME/LeoApp.git
-Open in Android Studio
-Sync Gradle
-Run app → target API 26+
-🧭 Milestones
-✅ V12 – Stable baseline (working chat, dark mode)
-⏳ V13 – Swipe polish, top bar cleanup, Settings improvements
-🚧 V14+ – Voice, sentiment, and AI integration
-🧩 License
-Private development build for personal use.
-Copyright © 2025 Dad
+   ./gradlew :app:assembleDebug
+
+4. Dark Mode persists via ThemeRepository (SharedPreferences).
+
+
+
+
+---
+
+🧪 Continuous Integration
+
+Every push/PR to V13-dev runs Android CI (assembleDebug).
+
+The badge above shows current status.
+
+PRs receive a sticky PASS/FAIL comment with a link to the run.
+
+
+
+---
+
+🧭 Workflow
+
+Patch-only on V13-dev; CI must be green before merging to main.
+
+
+---
+
+© 2025 JohnnyBravo1977 — built with brains, caffeine, and stubbornness.
