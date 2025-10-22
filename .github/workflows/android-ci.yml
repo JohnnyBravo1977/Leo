@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 30
     env:
       # Use a writable location for the debug keystore to avoid permission issues on runners
-      ANDROID_SDK_HOME: ${{ runner.temp }}
+      ANDROID_SDK_HOME: ${{ env.HOME }}
 
     steps:
       - name: Checkout
