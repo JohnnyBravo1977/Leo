@@ -1,4 +1,9 @@
 name: Android CI
+run-name: Android CI — ${{ github.ref_name }} @ ${{ github.sha }}
+
+permissions:
+  contents: read
+  pull-requests: write
 
 on:
   push:
@@ -39,3 +44,55 @@ jobs:
 
       - name: Build Debug APK
         run: ./gradlew :app:assembleDebug --stacktrace
+
+      - name: Summarize build result
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          if [ "$JOB_STATUS" = "success" ]; then
+            echo "✅ Android CI passed (assembleDebug)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "❌ Android CI failed — check logs above" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Comment status on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = `${{ job.status }}`;
+            const url = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const body = status === 'success'
+              ? `<!-- android-ci-status --> ✅ **Android CI** passed (assembleDebug). [View run](${url})`
+              : `<!-- android-ci-status --> ❌ **Android CI** failed. [View run for errors](${url})`;
+            const {owner, repo} = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const {data: comments} = await github.rest.issues.listComments({owner, repo, issue_number});
+            const existing = comments.find(c => c.body && c.body.includes('<!-- android-ci-status -->'));
+            if (existing) {
+              await github.rest.issues.updateComment({owner, repo, comment_id: existing.id, body});
+            } else {
+              await github.rest.issues.createComment({owner, repo, issue_number, body});
+            }
+
+
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..2222222
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1,38 @@
++# 🟢 Leo (Android)
++
++[![Android CI — V13-dev](https://github.com/JohnnyBravo1977/Leo/actions/workflows/android-ci.yml/badge.svg?branch=V13-dev)](https://github.com/JohnnyBravo1977/Leo/actions/workflows/android-ci.yml)
++
++**Status:** ✅ Build passing on `V13-dev`
++
++Lightweight Jetpack Compose app with a single top app bar, chat screen, and settings screen (Dark Mode included).
++
++---
++
++## 🧰 Developer Quickstart
