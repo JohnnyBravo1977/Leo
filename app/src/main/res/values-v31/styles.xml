@@ -6,7 +6,7 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
 
         <!-- Use your full splash art -->
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_illustration</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>
         <item name="android:windowSplashScreenBackground">@color/splash_background</item>
     </style>
 </resources>
