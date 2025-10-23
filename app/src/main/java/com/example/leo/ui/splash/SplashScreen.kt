@@ -15,6 +15,11 @@ import androidx.compose.ui.res.painterResource
 import com.example.leo.R
 import kotlinx.coroutines.delay
 
+/**
+ * Full-bleed splash artwork.
+ * Android 12+ shows the system splash briefly; this composable fades in and holds.
+ * Total display time ~7s (1s fade + 6s hold), then onFinished() is invoked.
+ */
 @Composable
 fun SplashScreen(
     modifier: Modifier = Modifier,
@@ -23,14 +28,15 @@ fun SplashScreen(
     val alpha = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
-        alpha.animateTo(1f, animationSpec = tween(500)) // fade in
-        delay(7000)                                      // brief hold
-        onFinished()                                    // hand off to main screen
+        // 1s fade in + 6s hold = ~7s total
+        alpha.animateTo(1f, animationSpec = tween(1000))
+        delay(500)
+        onFinished()
     }
 
     Box(modifier = modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.splash_illustration), // or R.drawable.splash_full
+            painter = painterResource(id = R.drawable.splash_illustration),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxSize()

@@ -12,23 +12,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.leo.ui.splash.SplashScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splash = installSplashScreen()
+        splash.setKeepOnScreenCondition { false }
         super.onCreate(savedInstanceState)
         setContent {
-            // ✅ These now resolve because of the runtime imports above
             var showSplash by remember { mutableStateOf(true) }
 
             if (showSplash) {
                 SplashScreen(onFinished = { showSplash = false })
             } else {
-                if (showSplash) {
-                    SplashScreen(onFinished = { showSplash = false })
-                } else {
-                    com.example.leo.ui.chat.ChatScreen()   // or whatever your main composable is
-                }
-
+                // Real app entry point
+                com.example.leo.ui.chat.ChatScreen()
             }
         }
     }
