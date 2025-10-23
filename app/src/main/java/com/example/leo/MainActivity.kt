@@ -1,26 +1,35 @@
 package com.example.leo
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
-import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.core.animation.doOnEnd
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.example.leo.ui.LittleGeniusApp
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import com.example.leo.ui.splash.SplashScreen
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splash = installSplashScreen()
         super.onCreate(savedInstanceState)
+        setContent {
+            // ✅ These now resolve because of the runtime imports above
+            var showSplash by remember { mutableStateOf(true) }
 
-        splash.setOnExitAnimationListener { provider ->
-            val view = provider.view
-            val fade = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f)
-            fade.duration = 280L
-            fade.doOnEnd { provider.remove() }
-            fade.start()
+            if (showSplash) {
+                SplashScreen(onFinished = { showSplash = false })
+            } else {
+                if (showSplash) {
+                    SplashScreen(onFinished = { showSplash = false })
+                } else {
+                    com.example.leo.ui.chat.ChatScreen()   // or whatever your main composable is
+                }
+
+            }
         }
-
-        setContent { LittleGeniusApp() }
     }
 }
