@@ -5,9 +5,8 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
 
-        <!-- Android 12+ splash screen config -->
-        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
-        <item name="android:windowSplashScreenBackground">@android:color/white</item>
-        <!-- (Optional) Keep logo on screen a bit longer with installSplashScreen() code you already have -->
+        <!-- Use your full splash art -->
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_illustration</item>
+        <item name="android:windowSplashScreenBackground">@color/splash_background</item>
     </style>
 </resources>

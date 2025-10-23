@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -41,7 +42,7 @@ fun LittleGeniusApp() {
     MaterialTheme(colorScheme = colorScheme) {
         Scaffold(
             topBar = {
-                TopAppBar(
+                CenterAlignedTopAppBar(
                     title = { Text(titleFor(route)) },
                     navigationIcon = {
                         if (route == Routes.Settings) {
@@ -88,7 +89,7 @@ fun LittleGeniusApp() {
 
 private fun titleFor(route: String?): String = when (route) {
     Routes.Settings -> "Settings"
-    else -> "Leo"
+    else -> "Little Genius"
 }
 
 private object Routes {
