@@ -1,5 +1,14 @@
 # 🟢 Leo (Android)
 
+## Charter Compliance
+All builds and syncpacks must align with the active Leo Charter version.
+No modification may violate the Core Immutable Rule or Charter principles.
+`LEO-CHARTER.md` is mandatory in root and travels with every syncpack.
+Verify Charter version matches or exceeds local before applying any pack.
+
+Note: The Core Principle (Leo never misleads the children) is immutable and cannot be altered.
+All contributors must acknowledge this rule as permanent.
+
 [![Android CI — V13-dev](https://github.com/JohnnyBravo1977/Leo/actions/workflows/android-ci.yml/badge.svg?branch=V13-dev)](https://github.com/JohnnyBravo1977/Leo/actions/workflows/android-ci.yml)
 
 **Status:** ✅ Build passing on `V13-dev`

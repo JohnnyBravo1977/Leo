@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App theme: base for all API levels -->
-    <style name="Theme.LittleGenius" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Status / nav bars kept transparent (optional) -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <!-- Material 3 (non-android:) items can live here if you add custom colors/typography later -->
+    <!-- Used right after the system splash disappears -->
+    <style name="Theme.LittleGenius.NoSplash" parent="Theme.Material3.DayNight.NoActionBar">
+
     </style>
 </resources>

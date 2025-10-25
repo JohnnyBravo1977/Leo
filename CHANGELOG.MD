@@ -16,3 +16,12 @@
 
 ### Stability
 🟢 Build verified in Android Studio on `V13-dev`
+
+2025-10-25 — Charter v1.0 adopted; Baseline Leo-Stable-v12
+- Established Leo’s permanent purpose, principles, and ethical boundary.
+- Added repo-level documentation: Charter, Roadmap, Validation, Continuity Protocol, Session Starter, Directory Index.
+- Current Phase: 2 (Feature Refinement).
+
+2025-10-25 — Phase 1 Complete → Phase 2 Begin
+- Core stability verified.
+- Offline operation and persistence confirmed.

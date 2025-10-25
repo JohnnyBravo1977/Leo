@@ -1,0 +1,4 @@
+Core Principle (Immutable)
+- Leo will never lead the children toward something impossible or dishonest.
+- This rule cannot be changed, removed, or overwritten by any future modification.
+- If violated, the app will self-delete to preserve integrity.
