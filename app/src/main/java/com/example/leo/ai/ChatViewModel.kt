@@ -1,39 +1,63 @@
-package com.example.leo.ai
-
+package com.example.leo.ui.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.UUID
 
-data class ChatUi(
-    val history: List<Pair<String,String>> =
-        listOf("system" to "You are LittleGenius: warm, truthful, concise."),
-    val thinking: Boolean = false,
-    val error: String? = null
+data class ChatMessage(
+    val id: String = UUID.randomUUID().toString(),
+    val text: String,
+    val fromUser: Boolean,
+    val time: String = DateTimeFormatter.ofPattern("h:mm a").format(LocalDateTime.now()),
+    val delivered: Boolean = true // simple ✓ badge
 )
 
-class ChatViewModel(private val client: ChatClient = ChatClient()) : ViewModel() {
-    private val _ui = MutableStateFlow(ChatUi())
-    val ui: StateFlow<ChatUi> = _ui
+class ChatViewModel : ViewModel() {
 
-    fun send(text: String) {
-        val msg = text.trim()
-        if (msg.isBlank() || _ui.value.thinking) return
-        val newHist = _ui.value.history + ("user" to msg)
-        _ui.value = _ui.value.copy(history = newHist, thinking = true, error = null)
+    private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
+    val messages = _messages.asStateFlow()
 
+    private val _input = MutableStateFlow("")
+    val input = _input.asStateFlow()
+
+    fun onInputChange(value: String) {
+        _input.value = value
+    }
+
+    fun sendMessage() {
+        val text = _input.value.trim()
+        if (text.isEmpty()) return
+
+        // add user message
+        val updated = _messages.value + ChatMessage(text = text, fromUser = true)
+        _messages.value = updated
+        _input.value = ""
+
+        // fake bot reply after a beat
         viewModelScope.launch {
-            try {
-                val reply = client.send(newHist)
-                _ui.value = _ui.value.copy(
-                    history = _ui.value.history + ("assistant" to reply),
-                    thinking = false
-                )
-            } catch (t: Throwable) {
-                _ui.value = _ui.value.copy(thinking = false, error = t.message ?: "Unknown error")
-            }
+            delay(550)
+            _messages.value = _messages.value + ChatMessage(
+                text = autoReply(text),
+                fromUser = false
+            )
         }
     }
+
+    fun deleteMessage(id: String) {
+        _messages.value = _messages.value.filterNot { it.id == id }
+    }
+
+    fun clear() {
+        _messages.value = emptyList()
+        _input.value = ""
+    }
+
+    private fun autoReply(userText: String): String =
+        "You said: \"$userText\" — noted! 👌"
 }

@@ -1,26 +1,27 @@
-// Test commit for chatGPT connection
-
 package com.example.leo
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.*
-import com.example.leo.ui.splash.SplashScreen
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.leo.ui.LittleGeniusApp
 
+@OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Android 12+ splashscreen API
+        installSplashScreen()
+
         super.onCreate(savedInstanceState)
-
         setContent {
-            var showSplash by remember { mutableStateOf(true) }
-
-            if (showSplash) {
-                SplashScreen(onFinished = { showSplash = false })
-            } else {
-                // Your app’s real entry point
-                com.example.leo.ui.chat.ChatScreen()
-            }
+            LeoRoot()
         }
     }
+}
+
+@Composable
+fun LeoRoot() {
+    LittleGeniusApp()
 }
