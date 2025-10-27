@@ -1,0 +1,9 @@
+LEO QUICK HELP
+
+If Leo is weird:
+1) Say “Doctor Leo” or tap Help → Fix Leo.
+2) Tap “Quick Fix.” Wait a moment.
+3) If still weird, tap “Safe Mode” so you can keep chatting.
+
+Leo will tell you what he fixed and won’t erase your messages without asking.
+If you see a lock, ask an adult for the PIN.

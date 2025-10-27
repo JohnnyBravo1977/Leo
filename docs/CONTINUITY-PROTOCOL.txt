@@ -1,0 +1,15 @@
+# CONTINUITY PROTOCOL
+Session Init:
+“Load active baseline: Leo-Stable-v12. Recall Charter v1.0, Workflow README, Project Roadmap, and Changelog. We are beginning Phase [number]: [name].”
+
+Recall Order:
+1) Charter  2) Workflow  3) Roadmap  4) Changelog
+
+End-of-Session Ritual:
+Summarize achievements; log progress in Changelog draft.
+
+Safety Net:
+“Recall the Leo Charter and Workflow. Reset alignment to current phase.”
+
+Backups:
+Archive full repo after each phase sign-off.

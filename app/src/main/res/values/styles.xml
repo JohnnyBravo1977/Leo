@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Used right after the system splash disappears -->
+    <style name="Theme.LittleGenius.NoSplash" parent="Theme.Material3.DayNight.NoActionBar">
+
+    </style>
+</resources>

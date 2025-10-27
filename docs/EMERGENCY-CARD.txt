@@ -1,0 +1,9 @@
+LEO EMERGENCY CARD (Tape inside tablet case)
+
+If Leo won’t start or keeps crashing:
+1) Open the app → Help → Fix Leo.
+2) Try Quick Fix → then Safe Mode.
+3) If needed: Rollback to Previous (keeps messages).
+4) Last resort (adult only): Factory Stable (PIN).
+
+Voice: “Doctor Leo” • “Safe Mode” • “Go back to last good version”
