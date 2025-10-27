@@ -1,0 +1,4 @@
+?? _meta/branch.txt
+?? _meta/commit.txt
+?? _meta/nearest_tag.txt
+?? _meta/status.txt
