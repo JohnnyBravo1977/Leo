@@ -75,9 +75,9 @@ import com.example.leo.data.ChatRecord
 import com.example.leo.data.SyncStatus
 
 // -----------------------------
-// Random (simulate failure)
+// Brain
 // -----------------------------
-import kotlin.random.Random
+import com.example.leo.ai.BrainsEngine
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -211,7 +211,6 @@ fun ChatScreen(
                         } else false
                     }
                 )
-
                 SwipeToDismissBox(
                     state = dismissState,
                     backgroundContent = {
@@ -253,7 +252,7 @@ fun ChatScreen(
 }
 
 // ---------------------------------------
-// Sending / retry logic (simulated)
+// Sending / retry logic (now real, no echo)
 // ---------------------------------------
 private fun sendUserMessageWithRetry(
     scope: kotlinx.coroutines.CoroutineScope,
@@ -271,7 +270,7 @@ private fun sendUserMessageWithRetry(
         status = SyncStatus.Pending
     )
     messages += pending
-    kotlinx.coroutines.GlobalScope.launch { store.append(ctx, pending) }
+    scope.launch { store.append(ctx, pending) }
     actuallySendWithPossibleFailure(scope, messages, store, ctx, id, text)
 }
 
@@ -283,28 +282,33 @@ private fun actuallySendWithPossibleFailure(
     userId: Long,
     userText: String
 ) {
-    kotlinx.coroutines.GlobalScope.launch {
-        delay(450)
-        val failure = Random.nextFloat() < 0.30f
-        if (failure) {
-            store.updateStatus(ctx, userId, SyncStatus.Failed)
-            val idx = messages.indexOfFirst { it.id == userId }
-            if (idx >= 0) messages[idx] = messages[idx].copy(status = SyncStatus.Failed)
-        } else {
-            store.updateStatus(ctx, userId, SyncStatus.Sent)
-            val idx = messages.indexOfFirst { it.id == userId }
-            if (idx >= 0) messages[idx] = messages[idx].copy(status = SyncStatus.Sent)
-            delay(200)
-            val reply = ChatRecord(
-                id = System.currentTimeMillis(),
-                isUser = false,
-                text = "You said: $userText",
-                ts = System.currentTimeMillis(),
-                status = SyncStatus.Sent
-            )
-            messages += reply
-            store.append(ctx, reply)
+    scope.launch {
+        // brief typing delay for feel
+        delay(300)
+
+        // Mark user message as sent
+        store.updateStatus(ctx, userId, SyncStatus.Sent)
+        val idx = messages.indexOfFirst { it.id == userId }
+        if (idx >= 0) messages[idx] = messages[idx].copy(status = SyncStatus.Sent)
+
+        // Build history -> ask BrainsEngine
+        val history: List<Pair<Boolean, String>> = messages.map { it.isUser to it.text }
+        val engineReply = runCatching {
+            BrainsEngine.reply(history, userText)
+        }.getOrElse { e ->
+            "I hit a snag: ${e.message ?: "unknown error"}"
         }
+
+        // Append bot reply
+        val reply = ChatRecord(
+            id = System.currentTimeMillis(),
+            isUser = false,
+            text = engineReply,
+            ts = System.currentTimeMillis(),
+            status = SyncStatus.Sent
+        )
+        messages += reply
+        store.append(ctx, reply)
     }
 }
 
@@ -332,6 +336,7 @@ private fun MessageRow(
             )
             Spacer(Modifier.size(8.dp))
         }
+
         val containerColor =
             if (isUser) MaterialTheme.colorScheme.primaryContainer
             else MaterialTheme.colorScheme.surfaceVariant
@@ -359,6 +364,7 @@ private fun MessageRow(
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(Modifier.size(2.dp))
+
                 val meta = buildString {
                     append(formatTs(message.ts))
                     if (message.isUser && message.status != SyncStatus.Sent) {
@@ -379,6 +385,7 @@ private fun MessageRow(
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
                     )
                 }
+
                 if (message.isUser && message.status == SyncStatus.Failed) {
                     Spacer(Modifier.height(4.dp))
                     Row(
@@ -390,6 +397,7 @@ private fun MessageRow(
                 }
             }
         }
+
         if (isUser) {
             Spacer(Modifier.size(8.dp))
             Box(
