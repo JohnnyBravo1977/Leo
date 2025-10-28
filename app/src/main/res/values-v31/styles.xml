@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Single app theme used everywhere -->
+    <!-- System splash for Android 12+: show a plain white frame, no icon -->
     <style name="Theme.LittleGenius" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Make the system splash just a white sheet, no icon -->
-        <item name="android:windowSplashScreenBackground">@android:color/white</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/transparent</item>
-        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
-
-        <!-- Cosmetic: keep system bars clean -->
+        <item name="android:windowSplashScreenBackground">@android:color/white</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
 </resources>

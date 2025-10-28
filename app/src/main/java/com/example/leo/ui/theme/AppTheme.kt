@@ -8,7 +8,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.example.leo.data.ThemeMode
+// 🚫 remove: import com.example.leo.data.ThemeMode
 
 // Keep palettes conservative; refine later if you want custom colors.
 private val LightColors = lightColorScheme()
@@ -16,7 +16,6 @@ private val LightColors = lightColorScheme()
 private val DarkColors = darkColorScheme()
 
 // True black for AMOLED: black surfaces + white text.
-// We leave accents to defaults so the app still looks Material.
 private val BlackColors = darkColorScheme(
     background     = Color(0xFF000000),
     surface        = Color(0xFF000000),
@@ -25,18 +24,30 @@ private val BlackColors = darkColorScheme(
     onSurface      = Color(0xFFFFFFFF)
 )
 
+/**
+ * Single-boolean theme API.
+ * - darkTheme = true uses DarkColors (or BlackColors if amoledBlack = true)
+ * - darkTheme = false uses LightColors
+ *
+ * File name can stay AppTheme.kt, function is LeoTheme to match MainActivity.
+ */
 @Composable
-fun AppTheme(
-    mode: ThemeMode,
+fun LeoTheme(
+    darkTheme: Boolean = false,
+    amoledBlack: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val scheme = when (mode) {
-        ThemeMode.Light -> LightColors
-        ThemeMode.Dark  -> DarkColors
-        ThemeMode.Black -> BlackColors
-    }
+    val scheme =
+        if (darkTheme) {
+            if (amoledBlack) BlackColors else DarkColors
+        } else {
+            LightColors
+        }
+
+    // If you don't have a Typography object defined, delete "typography = Typography,"
     MaterialTheme(
         colorScheme = scheme,
+        // typography = Typography,
         content = content
     )
 }

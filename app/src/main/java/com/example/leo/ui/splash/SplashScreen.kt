@@ -25,7 +25,7 @@ fun SplashScreen(onFinished: () -> Unit) {
 
     // When your app is ready, call onFinished(). Here we just wait ~1s.
     LaunchedEffect(Unit) {
-        delay(1000) // tweak if you want longer/shorter
+        delay(5000) // tweak if you want longer/shorter
         onFinished()
     }
 }
