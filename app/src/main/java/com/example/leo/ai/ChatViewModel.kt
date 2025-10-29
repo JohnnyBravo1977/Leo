@@ -22,7 +22,7 @@ data class ChatMessage(
 
 class ChatViewModel : ViewModel() {
 
-    private val engine: ChatEngine = BrainsEngine
+    private val engine = BrainsEngine ()
 
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val messages = _messages.asStateFlow()
