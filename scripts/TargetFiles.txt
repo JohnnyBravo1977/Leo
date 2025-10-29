@@ -1,0 +1,7 @@
+app/src/main/java/com/example/leo/ui/LittleGeniusApp.kt
+app/src/main/java/com/example/leo/ui/chat/ChatScreen.kt
+app/src/main/java/com/example/leo/ai/ChatClient.kt
+app/src/main/java/com/example/leo/ui/settings/SettingsScreen.kt
+app/src/main/AndroidManifest.xml
+app/build.gradle.kts
+docs/WORKFLOW-README.txt
