@@ -1,6 +1,15 @@
-* text=auto eol=lf
-*.bat text eol=crlf
-*.cmd text eol=crlf
-*.ps1 text eol=crlf
-*.png binary
-*.jpg binary
+# Treat text files as text, lock them to LF in the repo
+*           text=auto eol=lf
+
+# Windows-y scripts should stay CRLF in your working tree
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+*.ps1       text eol=crlf
+
+# Binary files must never be altered
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.pdf       binary
+*.jar       binary

@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-
 // -----------------------------
 // Compose Material 3
 // -----------------------------
@@ -26,15 +25,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarResult
-
 // -----------------------------
 // Compose Runtime / UI
 // -----------------------------
@@ -46,38 +44,34 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-
 // -----------------------------
 // Material Icons (extended)
 // -----------------------------
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Settings
-
 // -----------------------------
 // Time & formatting (API 26+)
 // -----------------------------
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-
 // -----------------------------
 // Coroutines
 // -----------------------------
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
 // -----------------------------
 // Data / Store
 // -----------------------------
 import com.example.leo.data.ChatStore
 import com.example.leo.data.ChatRecord
 import com.example.leo.data.SyncStatus
-
+import com.example.leo.ai.ChatClient
 // -----------------------------
-// Brain
+// UI padding for edge-to-edge
 // -----------------------------
-import com.example.leo.ai.BrainsEngine
+import androidx.compose.foundation.layout.statusBarsPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,8 +83,8 @@ fun ChatScreen(
     val scope = rememberCoroutineScope()
     val snackbar = remember { SnackbarHostState() }
 
-    // Load history once
     val messages = remember { mutableStateListOf<ChatRecord>() }
+
     LaunchedEffect(Unit) {
         messages.clear()
         messages += ChatStore.read(ctx)
@@ -112,8 +106,8 @@ fun ChatScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            // ✅ Settings on LEFT, Trash on RIGHT, title centered
             CenterAlignedTopAppBar(
+                modifier = Modifier.statusBarsPadding(),
                 title = { Text("Little Genius") },
                 colors = TopAppBarDefaults.topAppBarColors(),
                 navigationIcon = {
@@ -158,7 +152,7 @@ fun ChatScreen(
                         val msg = input.trim()
                         if (msg.isNotEmpty()) {
                             input = ""
-                            sendUserMessageWithRetry(
+                            sendUserMessage(
                                 scope = scope,
                                 messages = messages,
                                 store = ChatStore,
@@ -180,7 +174,7 @@ fun ChatScreen(
         ) {
             itemsIndexed(
                 items = messages,
-                key = { _, item -> item.id } // stable key for swipe state
+                key = { _, item -> item.id }
             ) { index, item ->
                 val dismissState = rememberSwipeToDismissBoxState(
                     confirmValueChange = { value ->
@@ -211,6 +205,7 @@ fun ChatScreen(
                         } else false
                     }
                 )
+
                 SwipeToDismissBox(
                     state = dismissState,
                     backgroundContent = {
@@ -224,27 +219,7 @@ fun ChatScreen(
                     enableDismissFromStartToEnd = true,
                     enableDismissFromEndToStart = true
                 ) {
-                    MessageRow(
-                        message = item,
-                        onRetry = {
-                            scope.launch {
-                                val idx = messages.indexOfFirst { it.id == item.id }
-                                if (idx >= 0) {
-                                    messages[idx] =
-                                        messages[idx].copy(status = SyncStatus.Pending)
-                                }
-                                ChatStore.updateStatus(ctx, item.id, SyncStatus.Pending)
-                                actuallySendWithPossibleFailure(
-                                    scope = scope,
-                                    messages = messages,
-                                    store = ChatStore,
-                                    ctx = ctx,
-                                    userId = item.id,
-                                    userText = item.text
-                                )
-                            }
-                        }
-                    )
+                    MessageRow(message = item)
                 }
             }
         }
@@ -252,9 +227,9 @@ fun ChatScreen(
 }
 
 // ---------------------------------------
-// Sending / retry logic (now real, no echo)
+// Sending logic (no simulated failure)
 // ---------------------------------------
-private fun sendUserMessageWithRetry(
+private fun sendUserMessage(
     scope: kotlinx.coroutines.CoroutineScope,
     messages: MutableList<ChatRecord>,
     store: ChatStore,
@@ -271,10 +246,10 @@ private fun sendUserMessageWithRetry(
     )
     messages += pending
     scope.launch { store.append(ctx, pending) }
-    actuallySendWithPossibleFailure(scope, messages, store, ctx, id, text)
+    actuallySend(scope, messages, store, ctx, id, text)
 }
 
-private fun actuallySendWithPossibleFailure(
+private fun actuallySend(
     scope: kotlinx.coroutines.CoroutineScope,
     messages: MutableList<ChatRecord>,
     store: ChatStore,
@@ -283,27 +258,22 @@ private fun actuallySendWithPossibleFailure(
     userText: String
 ) {
     scope.launch {
-        // brief typing delay for feel
-        delay(300)
-
-        // Mark user message as sent
         store.updateStatus(ctx, userId, SyncStatus.Sent)
         val idx = messages.indexOfFirst { it.id == userId }
         if (idx >= 0) messages[idx] = messages[idx].copy(status = SyncStatus.Sent)
 
-        // Build history -> ask BrainsEngine
-        val history: List<Pair<Boolean, String>> = messages.map { it.isUser to it.text }
-        val engineReply = runCatching {
-            BrainsEngine.reply(history, userText)
-        }.getOrElse { e ->
-            "I hit a snag: ${e.message ?: "unknown error"}"
+        val botText = try {
+            ChatClient().send(listOf("user" to userText))
+        } catch (_: Exception) {
+            "I'm having trouble thinking right now, but I heard: \"$userText\""
         }
 
-        // Append bot reply
+        delay(200)
+
         val reply = ChatRecord(
             id = System.currentTimeMillis(),
             isUser = false,
-            text = engineReply,
+            text = botText,
             ts = System.currentTimeMillis(),
             status = SyncStatus.Sent
         )
@@ -316,10 +286,7 @@ private fun actuallySendWithPossibleFailure(
 // UI bits
 // -----------------------------
 @Composable
-private fun MessageRow(
-    message: ChatRecord,
-    onRetry: () -> Unit
-) {
+private fun MessageRow(message: ChatRecord) {
     val isUser = message.isUser
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -349,12 +316,7 @@ private fun MessageRow(
                 containerColor = containerColor,
                 contentColor = contentColor
             ),
-            shape = RoundedCornerShape(
-                topStart = if (isUser) 16.dp else 4.dp,
-                topEnd = if (isUser) 4.dp else 16.dp,
-                bottomStart = 16.dp,
-                bottomEnd = 16.dp
-            ),
+            shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
         ) {
             Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
@@ -364,37 +326,11 @@ private fun MessageRow(
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(Modifier.size(2.dp))
-
-                val meta = buildString {
-                    append(formatTs(message.ts))
-                    if (message.isUser && message.status != SyncStatus.Sent) {
-                        append(" • ")
-                        append(
-                            when (message.status) {
-                                SyncStatus.Pending -> "sending…"
-                                SyncStatus.Failed -> "failed"
-                                else -> ""
-                            }
-                        )
-                    }
-                }
-                if (meta.isNotBlank()) {
-                    Text(
-                        text = meta,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
-                    )
-                }
-
-                if (message.isUser && message.status == SyncStatus.Failed) {
-                    Spacer(Modifier.height(4.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        TextButton(onClick = onRetry) { Text("Retry") }
-                    }
-                }
+                Text(
+                    text = formatTs(message.ts),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
+                )
             }
         }
 
