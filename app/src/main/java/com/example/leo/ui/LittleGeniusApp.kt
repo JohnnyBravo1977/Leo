@@ -1,46 +1,50 @@
 package com.example.leo.ui
 
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material3.Scaffold
+import android.net.Uri
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.leo.ai.ChatClient // kept for future DI
 import com.example.leo.ui.chat.ChatScreen
 import com.example.leo.ui.settings.SettingsScreen
+import com.example.leo.ui.theme.LeoTheme
+import com.example.leo.data.ThemePrefs
 
-object Routes {
-    const val Chat = "chat"
-    const val Settings = "settings"
-}
-
+/**
+ * App-level NavHost and theme wrapper.
+ * This is intentionally tiny and explicit to avoid drift.
+ */
 @Composable
 fun LittleGeniusApp() {
+    // DataStore-backed preferences
+    val prefs = ThemePrefs(LocalContext.current)
+    val isDark by prefs.darkModeFlow.collectAsState(initial = false)
+
+    // Single NavController for the app
     val nav = rememberNavController()
 
-    Scaffold(
-        contentWindowInsets = WindowInsets.systemBars
-    ) { inner ->
+    LeoTheme(darkTheme = isDark) {
         NavHost(
             navController = nav,
-            startDestination = Routes.Chat,
-            modifier = Modifier.padding(inner)
+            startDestination = "chat"
         ) {
-            composable(Routes.Chat) {
+            composable("chat") {
                 ChatScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    onOpenSettings = { nav.navigate(Routes.Settings) }
+                    onOpenSettings = { nav.navigate("settings") }
                 )
             }
-            composable(Routes.Settings) {
+            composable("settings") {
                 SettingsScreen(
+                    isDark = isDark,
+                    onToggleDark = { enabled -> prefs.setDarkMode(enabled) },
                     onBack = { nav.popBackStack() }
                 )
             }
         }
     }
 }
+
